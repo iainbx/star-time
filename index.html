@@ -1,1 +1,100 @@
-hello world
+<html>
+
+<head>
+</head>
+
+<body>
+	<div>UTC: <span id="UTC"></span></div>
+	<div>JD: <span id="JD"></span></div>
+	<div>GMST: <span id="GMST"></span></div>
+	<div>LMST: <span id="LMST"></span></div>
+
+<script>
+	document.body.onload = function() {
+		// The basic idea is to use the known GMST of a UTC in the past to calculate the GMST of the current UTC.
+		
+		// get UTC
+		var now = new Date();
+		var year = now.getUTCFullYear();
+		var month = now.getUTCMonth() + 1;
+		var day = now.getUTCDate();
+		var hours = now.getUTCHours();
+		var minutes = now.getUTCMinutes();
+		var seconds = now.getUTCSeconds();
+		
+		var elUTC = document.getElementById("UTC");
+		elUTC.innerText = year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
+		
+		// calculate Julian day number of UTC 
+		// Julian Date with the hours, minutes and seconds set equal to zero, 0h 0m 0.0
+		// number of whole days days since noon Universal Time on January 1, 4713 BCE (on the Julian calendar)
+		var jd = 367 * year;
+		jd = jd - Math.floor(7 * (year + Math.floor((month + 9) / 12)) / 4);
+		jd = jd + Math.floor(275 * month / 9);
+		jd = jd + day;
+		jd = jd + 1721013.5;
+		// add time as a fraction of a day
+		//jd = jd + (hours + (minutes + seconds / 60) / 60) / 24;	
+		
+		var elJD = document.getElementById("JD");
+		elJD.innerText = jd;
+		
+		// calculate Julian centuries since the epoch J2000 (noon on January 1, 2000)
+		var jc = (jd - 2451545) / 36525;
+		
+		// calculate Greenwich sidereal time for the beginning of the day in degrees
+		var GST0 = 100.4606184 + 36000.77005361 * jc + 0.00038793 * jc * jc;
+		// normalize to 360 degrees
+		GST0 = GST0 % 360;
+		
+		// calculate sidereal time that has passed since the beginning of the day in degrees
+		// sidereal time rate is 0.25... degrees per minute
+		var GST1 = 0.25068447733746215 * (hours * 60 + minutes + seconds / 60);
+		
+		// GST in degrees
+		GST = GST0 + GST1;
+		
+		var elGMST = document.getElementById("GMST");
+		elGMST.innerText = GST;
+		
+		calcLMST();
+		
+	}
+	
+	function calcLMST() {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(setLMST,showError);
+		} else {
+			alert("x");
+		}
+	}
+	
+	function setLMST(position) {
+ 			alert("y");
+		var elLMST = document.getElementById("LMST");
+		elLMST.innerText = GST + position.coords.longitude;
+	}
+
+function showError(error) {
+		var elLMST = document.getElementById("LMST");
+    switch(error.code) {
+        case error.PERMISSION_DENIED:
+            elLMST.innerHTML = "User denied the request for Geolocation."
+            break;
+        case error.POSITION_UNAVAILABLE:
+            elLMST.innerHTML = "Location information is unavailable."
+            break;
+        case error.TIMEOUT:
+            elLMST.innerHTML = "The request to get user location timed out."
+            break;
+        case error.UNKNOWN_ERROR:
+            elLMST.innerHTML = "An unknown error occurred."
+            break;
+    }
+}
+
+
+</script>
+</body>
+
+</html>
