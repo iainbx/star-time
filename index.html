@@ -8,8 +8,9 @@
 	<div>Latitude: <span id="LAT"></span></div>
 	<div>Longitude: <span id="LONG"></span></div>
 	<div>JD: <span id="JD"></span></div>
-	<div>GMST: <span id="GMST"></span></div>
-	<div>LMST: <span id="LMST"></span></div>
+	<div>GMST degrees: <span id="GMST"></span></div>
+	<div>LMST degrees: <span id="LMST"></span></div>
+	<div>LMST hm: <span id="LMSTtime"></span></div>
 
 <script>
 	document.body.onload = function() {
@@ -75,8 +76,15 @@
 		elLAT.innerText = position.coords.latitude;
  		var elLONG = document.getElementById("LONG");
 		elLONG.innerText = position.coords.longitude;
- 		var elLMST = document.getElementById("LMST");
-		elLMST.innerText = GST + position.coords.longitude;
+ 		var LMSTdegrees = GST + position.coords.longitude;
+		var elLMST = document.getElementById("LMST");
+		elLMST.innerText = LMSTdegrees;
+		// convert to minutes
+		var LMSTtimeMinutes = LMSTdegrees * 4;
+		var LMSTHours = Math.floor(LMSTtimeMinutes / 60); 
+		var LMSTminutes = LMSTtimeMinutes % 60;
+		var elLMSTtime = document.getElementById("LMSTtime");
+		elLMSTtime.innerText = LMSTHours + ":" + LMSTminutes;
 	}
 
 function showError(error) {
