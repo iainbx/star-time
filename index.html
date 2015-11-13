@@ -5,6 +5,8 @@
 
 <body>
 	<div>UTC: <span id="UTC"></span></div>
+	<div>Latitude: <span id="LAT"></span></div>
+	<div>Longitude: <span id="LONG"></span></div>
 	<div>JD: <span id="JD"></span></div>
 	<div>GMST: <span id="GMST"></span></div>
 	<div>LMST: <span id="LMST"></span></div>
@@ -65,13 +67,15 @@
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(setLMST,showError);
 		} else {
-			alert("x");
 		}
 	}
 	
 	function setLMST(position) {
- 			alert("y");
-		var elLMST = document.getElementById("LMST");
+ 		var elLAT = document.getElementById("LAT");
+		elLAT.innerText = position.coords.latitude;
+ 		var elLONG = document.getElementById("LONG");
+		elLONG.innerText = position.coords.longitude;
+ 		var elLMST = document.getElementById("LMST");
 		elLMST.innerText = GST + position.coords.longitude;
 	}
 
