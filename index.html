@@ -85,7 +85,7 @@
 		// convert to minutes
 		var LMSTtimeMinutes = LMSTdegrees * 4;
 		LMSTHours = Math.floor(LMSTtimeMinutes / 60); 
-		LMSTminutes = Math.round(LMSTtimeMinutes % 60);
+		LMSTminutes = Math.floor(LMSTtimeMinutes % 60);
 	}
 	
 	function showLMST() {
