@@ -84,7 +84,7 @@
 		var LMSTHours = Math.floor(LMSTtimeMinutes / 60); 
 		var LMSTminutes = Math.round(LMSTtimeMinutes % 60);
 		var elLMSTtime = document.getElementById("LMSTtime");
-		elLMSTtime.innerText = LMSTHours + ":" + LMSTminutes;
+		elLMSTtime.innerText = LMSTHours + ":" +  ('0'+LMSTminutes).slice(-2);
 	}
 
 function showError(error) {
