@@ -35,8 +35,8 @@
 		// get current position
 		getPos();
 	
-		// calculate and display LMST
-		updateLMST();
+		// calculate and display LMST every second
+		setInterval(updateLMST,1000);
 	}
 	
 	function updateLMST() {
