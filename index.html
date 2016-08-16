@@ -13,25 +13,51 @@
 	<div>LMST hm: <span id="LMSTtime"></span></div>
 
 <script>
+
+	// get UTC
+	var year = 0;
+	var month = 0;
+	var day = 0;
+	var hours = 0;
+	var minutes = 0;
+	var seconds = 0;
+	var jd = 0;
+	var GST = 0;
+	var latitude = 0;
+	var longitude = 0;
+	var LMSTdegrees = 0;
+	var LMSTHours = 0; 
+	var LMSTminutes = 0;
+	
 	document.body.onload = function() {
 		// The basic idea is to use the known GMST of a UTC in the past to calculate the GMST of the current UTC.
 		
+		// get current position
+		getPos();
+	
+		// calculate and display LMST every second
+		setInterval(updateLMST,1000);
+	}
+	
+	function updateLMST() {
+		calcLMST();
+		showLMST();
+	}
+	
+	function calcLMST() {
 		// get UTC
 		var now = new Date();
-		var year = now.getUTCFullYear();
-		var month = now.getUTCMonth() + 1;
-		var day = now.getUTCDate();
-		var hours = now.getUTCHours();
-		var minutes = now.getUTCMinutes();
-		var seconds = now.getUTCSeconds();
-		
-		var elUTC = document.getElementById("UTC");
-		elUTC.innerText = year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
+		year = now.getUTCFullYear();
+		month = now.getUTCMonth() + 1;
+		day = now.getUTCDate();
+		hours = now.getUTCHours();
+		minutes = now.getUTCMinutes();
+		seconds = now.getUTCSeconds();
 		
 		// calculate Julian day number of UTC 
 		// Julian Date with the hours, minutes and seconds set equal to zero, 0h 0m 0.0
 		// number of whole days days since noon Universal Time on January 1, 4713 BCE (on the Julian calendar)
-		var jd = 367 * year;
+		jd = 367 * year;
 		jd = jd - Math.floor(7 * (year + Math.floor((month + 9) / 12)) / 4);
 		jd = jd + Math.floor(275 * month / 9);
 		jd = jd + day;
@@ -39,8 +65,6 @@
 		// add time as a fraction of a day
 		//jd = jd + (hours + (minutes + seconds / 60) / 60) / 24;	
 		
-		var elJD = document.getElementById("JD");
-		elJD.innerText = jd;
 		
 		// calculate Julian centuries since the epoch J2000 (noon on January 1, 2000)
 		var jc = (jd - 2451545) / 36525;
@@ -57,34 +81,46 @@
 		// GST in degrees
 		GST = GST0 + GST1;
 		
-		var elGMST = document.getElementById("GMST");
-		elGMST.innerText = GST;
-		
-		calcLMST();
-		
+ 		LMSTdegrees = GST + longitude;
+		// convert to minutes
+		var LMSTtimeMinutes = LMSTdegrees * 4;
+		LMSTHours = Math.floor(LMSTtimeMinutes / 60); 
+		LMSTminutes = Math.floor(LMSTtimeMinutes % 60);
 	}
 	
-	function calcLMST() {
+	function showLMST() {
+		var elUTC = document.getElementById("UTC");
+		elUTC.innerText = year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
+		
+		var elJD = document.getElementById("JD");
+		elJD.innerText = jd;
+		
+		var elGMST = document.getElementById("GMST");
+		elGMST.innerText = GST;
+
+ 		var elLAT = document.getElementById("LAT");
+		elLAT.innerText = latitude;
+ 		
+		 var elLONG = document.getElementById("LONG");
+		elLONG.innerText = longitude;
+
+		var elLMST = document.getElementById("LMST");
+		elLMST.innerText = LMSTdegrees;
+
+		var elLMSTtime = document.getElementById("LMSTtime");
+		elLMSTtime.innerText = LMSTHours + ":" +  ('0'+LMSTminutes).slice(-2);
+	}
+	
+	function getPos() {
 		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(setLMST,showError);
+			navigator.geolocation.getCurrentPosition(setPos,showError);
 		} else {
 		}
 	}
 	
-	function setLMST(position) {
- 		var elLAT = document.getElementById("LAT");
-		elLAT.innerText = position.coords.latitude;
- 		var elLONG = document.getElementById("LONG");
-		elLONG.innerText = position.coords.longitude;
- 		var LMSTdegrees = GST + position.coords.longitude;
-		var elLMST = document.getElementById("LMST");
-		elLMST.innerText = LMSTdegrees;
-		// convert to minutes
-		var LMSTtimeMinutes = LMSTdegrees * 4;
-		var LMSTHours = Math.floor(LMSTtimeMinutes / 60); 
-		var LMSTminutes = Math.round(LMSTtimeMinutes % 60);
-		var elLMSTtime = document.getElementById("LMSTtime");
-		elLMSTtime.innerText = LMSTHours + ":" +  ('0'+LMSTminutes).slice(-2);
+	function setPos(position) {
+		latitude = position.coords.latitude;
+		longitude = position.coords.longitude;
 	}
 
 function showError(error) {
